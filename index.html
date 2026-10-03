@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="ru" data-app="clipper">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Clipper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="themes/dark.css" id="themeLink">
+<style id="themeStyle"></style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <header class="head">
+    <span class="head__title" data-i18n="appTitle">Сборка клипов</span>
+
+    <div class="seg" id="variants"></div>
+    <div class="head__sep"></div>
+    <div class="seg" id="formats"></div>
+    <div class="seg">
+      <input type="text" inputmode="numeric" class="seg__input" id="fw" value="1080">
+      <span class="seg__times">×</span>
+      <input type="text" inputmode="numeric" class="seg__input" id="fh" value="1920">
+    </div>
+
+    <div class="spacer"></div>
+
+    <button type="button" class="btn btn--icon" id="prefsBtn"
+            data-i18n-title="prefs" title="Настройки">⚙</button>
+
+    <div class="head__files">
+      <button type="button" class="head__slot" id="pickTrack" data-i18n-title="replaceTrack">
+        <span class="head__dot head__dot--empty" id="trackDot"></span>
+        <span class="head__name" id="trackName">track.wav</span>
+      </button>
+      <button type="button" class="head__slot" id="pickImage" data-i18n-title="replaceImage">
+        <span class="head__dot head__dot--empty" id="imageDot"></span>
+        <span class="head__name" id="imageName">cover.jpg</span>
+      </button>
+    </div>
+
+    <button type="button" class="btn btn--primary" id="scriptBtn" data-i18n="script">Скрипт</button>
+  </header>
+
+  <div class="app__strip" id="slotTop"></div>
+
+  <div class="app__body">
+
+    <section class="stage">
+      <div class="stage__area">
+        <!-- обёртка нужна бегунку: рамка кадра обрезает всё внутри себя -->
+        <div class="frame-box" id="frameBox">
+          <div class="frame" id="frame">
+            <canvas class="frame__cv" id="pv" width="405" height="720"></canvas>
+            <div class="frame__badge">
+              <span class="frame__badge-text" id="frameHint">перетащите обложку</span>
+            </div>
+            <div class="frame__progress"><div class="frame__progress-bar" id="progress"></div></div>
+          </div>
+          <div class="frame-box__scrub" id="scrub" data-i18n-title="scrubTitle" title="Тянуть — перемотать">
+            <div class="frame-box__head" id="knob"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage__track" id="slotBottom"></div>
+
+      <div class="transport">
+        <button type="button" class="btn btn--icon" id="anim" data-i18n-title="animStop">⏸</button>
+        <span class="transport__time" id="time">0.0 / 15.0</span>
+        <span class="transport__hint" id="stageHint"></span>
+      </div>
+    </section>
+
+    <aside class="panel" id="panel">
+      <div class="panel__head">
+        <button type="button" class="btn btn--icon" id="panelToggle"
+                data-i18n-title="panelCollapse" title="Свернуть панель">›</button>
+        <span class="panel__title" id="panelTitle" data-i18n="panelSettings">Настройки</span>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn--mini btn--on" id="multi"
+                data-i18n-title="multiOn" title="Открывать несколько (включено)">∞</button>
+        <button type="button" class="btn btn--mini" id="all"
+                data-i18n-title="collapseAll" title="Свернуть все">⌃</button>
+      </div>
+
+      <div class="panel__body" id="panelBody">
+
+        <!-- трек и отрезок: тело наполняется дорожкой в варианте «Шаги» -->
+        <section class="block" data-block="track">
+          <button type="button" class="block__head">
+            <span class="block__mark">+</span>
+            <span class="block__label" data-i18n="blockTrack">Трек и отрезок</span>
+            <span class="block__summary" data-summary="track"></span>
+          </button>
+          <div class="block__body" data-slot="track"></div>
+        </section>
+
+        <!-- кадр -->
+        <section class="block block--open" data-block="image">
+          <button type="button" class="block__head">
+            <span class="block__mark">−</span>
+            <span class="block__label" data-i18n="blockImage">Кадр</span>
+            <span class="block__summary" data-summary="image"></span>
+          </button>
+          <div class="block__body">
+            <div class="insp">
+              <div class="insp__col">
+                <button type="button" class="btn btn--action" id="pickImage2" data-i18n="replaceImageBtn">Заменить изображение…</button>
+                <div class="group__row">
+                  <button type="button" class="btn btn--action" id="imgFit" data-i18n="fitFrame">Вписать в кадр</button>
+                  <button type="button" class="btn btn--action" id="imgContain" data-i18n="contain">Целиком, с полями</button>
+                </div>
+                <div>
+                  <div class="group__title" data-i18n="smooth">Плавность движения</div>
+                  <div class="group__row" id="smooth"></div>
+                </div>
+              </div>
+              <div class="insp__rows" data-rows="image"></div>
+              <div class="insp__more" data-more="image"></div>
+              <p class="hint" data-hint="image"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- заставки до и после клипа -->
+        <section class="block" data-block="frames">
+          <button type="button" class="block__head">
+            <span class="block__mark">+</span>
+            <span class="block__label" data-i18n="blockFrames">Настройки кадров и превью</span>
+            <span class="block__summary" data-summary="frames"></span>
+          </button>
+          <div class="block__body">
+            <div class="insp">
+              <div class="insp__col">
+                <div class="group__title" data-i18n="introTitle">Начальный кадр</div>
+                <div class="group__list" id="introList"></div>
+                <div class="insp__col" id="introOpts" hidden>
+                  <div class="group__row">
+                    <select class="select" id="introAnim"></select>
+                    <select class="select" id="introDir"></select>
+                  </div>
+                  <div class="group__row">
+                    <button type="button" class="btn btn--action" id="introPick" data-i18n="replaceImageBtn">Заменить изображение…</button>
+                    <button type="button" class="btn btn--action" id="introContain" data-i18n="contain">Целиком, с полями</button>
+                  </div>
+                  <div class="insp__rows" data-rows="intro"></div>
+                  <div class="insp__more" data-more="intro"></div>
+                </div>
+              </div>
+              <div class="insp__col group__sep">
+                <div class="group__title" data-i18n="outroTitle">Конечный кадр</div>
+                <div class="group__list" id="outroList"></div>
+                <div class="insp__col" id="outroOpts" hidden>
+                  <div class="group__row">
+                    <select class="select" id="outroAnim"></select>
+                    <select class="select" id="outroDir"></select>
+                  </div>
+                  <div class="group__row">
+                    <button type="button" class="btn btn--action" id="outroPick" data-i18n="replaceImageBtn">Заменить изображение…</button>
+                    <button type="button" class="btn btn--action" id="outroContain" data-i18n="contain">Целиком, с полями</button>
+                  </div>
+                  <div class="insp__rows" data-rows="outro"></div>
+                  <div class="insp__more" data-more="outro"></div>
+                </div>
+              </div>
+              <p class="hint" data-i18n="hintFrames"></p>
+              <div class="insp__col group__sep">
+                <div class="group__title" data-i18n="thumbTitle">Превью в проводнике</div>
+                <select class="select" id="thumbMode"></select>
+                <div class="group__list" id="thumbList" hidden></div>
+                <label class="check" id="thumbSaveRow">
+                  <input type="checkbox" class="check__box" id="thumbSave">
+                  <span data-i18n="thumbSave">Сохранить рядом .jpg</span>
+                </label>
+                <div class="insp__rows" data-rows="thumb"></div>
+                <div class="insp__more" data-more="thumb"></div>
+                <p class="hint" data-hint="thumb"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- спектр -->
+        <section class="block" data-block="wave">
+          <button type="button" class="block__head">
+            <span class="block__mark">+</span>
+            <span class="block__label" data-i18n="blockWave">Спектр</span>
+            <span class="block__summary" data-summary="wave"></span>
+          </button>
+          <div class="block__body">
+            <div class="insp">
+              <div class="insp__col">
+                <button type="button" class="btn btn--chip" id="waveOn">Спектр выключен</button>
+                <select class="select" id="waveType"></select>
+                <div class="group__row">
+                  <div class="field">
+                    <div class="field__head"><span class="field__label" data-i18n="lineColor">Цвет линии</span></div>
+                    <div class="swatch" data-color="wave">
+                      <span class="swatch__dot"></span><span class="swatch__hex"></span>
+                    </div>
+                  </div>
+                </div>
+                <label class="check">
+                  <input type="checkbox" class="check__box" id="outlineOn">
+                  <span data-i18n="outline">Обводка</span>
+                </label>
+                <div class="group__row" id="outlineRow">
+                  <div class="field">
+                    <div class="field__head"><span class="field__label" data-i18n="outlineColor">Цвет обводки</span></div>
+                    <div class="swatch" data-color="outline">
+                      <span class="swatch__dot"></span><span class="swatch__hex"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="insp__rows" data-rows="wave"></div>
+              <div class="insp__more" data-more="wave"></div>
+              <p class="hint" data-hint="wave"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- текст -->
+        <section class="block" data-block="text">
+          <button type="button" class="block__head">
+            <span class="block__mark">+</span>
+            <span class="block__label" data-i18n="blockText">Текст</span>
+            <span class="block__summary" data-summary="text"></span>
+          </button>
+          <div class="block__body">
+            <div class="insp">
+              <div class="insp__col">
+                <div class="group__list" id="textList"></div>
+                <input type="text" class="field__input" id="textValue" data-i18n-ph="textPh">
+                <select class="select" id="textFont"></select>
+                <div class="field">
+                  <div class="field__head"><span class="field__label" data-i18n="color">Цвет</span></div>
+                  <div class="swatch" data-color="text">
+                    <span class="swatch__dot"></span><span class="swatch__hex"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="insp__rows" data-rows="text"></div>
+              <div class="insp__more" data-more="text"></div>
+              <p class="hint" data-hint="text"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- анимация -->
+        <section class="block" data-block="anim">
+          <button type="button" class="block__head">
+            <span class="block__mark">+</span>
+            <span class="block__label" data-i18n="blockAnim">Анимация</span>
+            <span class="block__summary" data-summary="anim"></span>
+          </button>
+          <div class="block__body">
+            <div class="insp">
+              <div class="insp__col">
+                <div class="group__list" id="animList"></div>
+                <select class="select" id="animType"></select>
+              </div>
+              <div class="insp__rows" data-rows="anim"></div>
+              <div class="insp__more" data-more="anim"></div>
+              <p class="hint" data-hint="anim"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- экспорт -->
+        <section class="block" data-block="export">
+          <button type="button" class="block__head">
+            <span class="block__mark">+</span>
+            <span class="block__label" data-i18n="blockExport">Экспорт</span>
+            <span class="block__summary" data-summary="export"></span>
+          </button>
+          <div class="block__body">
+            <div class="insp__col">
+              <div class="field">
+                <div class="field__head"><span class="field__label" data-i18n="baseDir">Каталог с файлами</span></div>
+                <input type="text" class="field__input" id="baseDir" spellcheck="false"
+                       placeholder="/home/user/project">
+              </div>
+              <div class="field">
+                <div class="field__head"><span class="field__label" data-i18n="renderer">Путь к рендеру</span></div>
+                <input type="text" class="field__input" id="renderer" spellcheck="false"
+                       value="./render-clip.py">
+              </div>
+              <div class="group__row">
+                <input type="text" class="field__input field" id="outName" value="clip01.mp4" spellcheck="false">
+                <button type="button" class="btn btn--primary" id="copyScript" data-i18n="copy">Скопировать</button>
+              </div>
+              <div class="group__row">
+                <button type="button" class="btn btn--action" id="addQueue" data-i18n="addQueue">Отложить в список</button>
+                <button type="button" class="btn btn--action" id="showScript" data-i18n="showScript">Показать скрипт</button>
+              </div>
+              <p class="warn" id="addWarn" hidden></p>
+              <div class="queue" id="queue"></div>
+              <p class="hint" data-hint="export"></p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- дорожка: один живой блок, переезжает между слотами по раскладке -->
+<div class="track" id="track">
+  <div class="track__row">
+    <button type="button" class="btn btn--icon" id="play" data-i18n-title="playSegment">▶</button>
+    <div class="track__cell">
+      <button type="button" class="btn btn--pill" id="pickTrack2" data-i18n="replaceTrackBtn">Заменить трек…</button>
+      <span class="track__label" data-i18n="from">с</span>
+      <input type="number" step="0.1" min="0" class="track__num" id="segStart" value="0">
+      <span class="track__label" data-i18n="to">по</span>
+      <input type="number" step="0.1" min="0" class="track__num" id="segEnd" value="15">
+      <span class="track__label" data-i18n="len">длит.</span>
+      <input type="number" step="0.5" min="3" class="track__num track__num--short" id="segLen" value="15">
+      <span class="track__total" id="trackTotal">— : —</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="track__cell" id="lenPresets"></div>
+  </div>
+
+  <div class="track__box" id="waveBox">
+    <canvas class="track__wave" id="wave"></canvas>
+    <button type="button" class="track__drop" id="trackDrop" data-i18n="dropTrack">
+      Перетащите WAV или MP3 сюда
+    </button>
+  </div>
+
+  <div class="track__foot">
+    <span class="track__hint" data-i18n="trackHint">Тянуть по волне — выбрать отрезок</span>
+    <button type="button" class="track__toggle" id="lanesToggle">− дорожки</button>
+  </div>
+
+  <div class="track__lanes" id="lanes"></div>
+</div>
+
+<!-- окно со скриптом -->
+<div class="modal" id="modal" hidden>
+  <div class="modal__box">
+    <div class="modal__head">
+      <span class="modal__title" data-i18n="scriptTitle">Готовый скрипт</span>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--primary" id="copyScript2" data-i18n="copy">Скопировать</button>
+        <button type="button" class="btn" id="closeModal" data-i18n="close">Закрыть</button>
+      </div>
+    </div>
+    <pre class="modal__pre" id="scriptText"></pre>
+  </div>
+</div>
+
+<!-- пипетка -->
+<div class="cpop" id="cpop" hidden>
+  <canvas class="cpop__sv" id="cSV" width="200" height="140"></canvas>
+  <canvas class="cpop__hue" id="cHue" width="200" height="14"></canvas>
+  <input type="text" class="cpop__hex" id="cHex" spellcheck="false" maxlength="7">
+</div>
+
+<!-- настройки: язык, тема, загрузка своих файлов -->
+<div class="prefs" id="prefs" hidden>
+  <div class="prefs__row">
+    <span class="prefs__label" data-i18n="langLabel">Язык</span>
+    <select class="select prefs__select" id="langSelect"></select>
+    <button type="button" class="btn btn--pill" id="langFile" data-i18n="fileBtn">Файл…</button>
+    <button type="button" class="btn btn--pill" id="langTemplate" data-i18n="templateBtn">Шаблон</button>
+  </div>
+  <div class="prefs__row">
+    <span class="prefs__label" data-i18n="themeLabel">Тема</span>
+    <select class="select prefs__select" id="themeSelect"></select>
+    <button type="button" class="btn btn--pill" id="themeFile" data-i18n="fileBtn">Файл…</button>
+  </div>
+  <p class="hint" data-i18n="prefsHint"></p>
+  <div class="prefs__foot">
+    <button type="button" class="btn btn--pill" id="prefsReset" data-i18n="resetBtn">Сбросить своё</button>
+  </div>
+</div>
+
+<script src="js/registry.js"></script>
+<script src="lang/ru.js"></script>
+<script src="lang/en.js"></script>
+<script src="config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/state.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/preview.js"></script>
+<script src="js/timeline.js"></script>
+<script src="js/inspector.js"></script>
+<script src="js/frames.js"></script>
+<script src="js/queue.js"></script>
+<script src="js/colorpicker.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1539 @@
+/* Clipper — оформление по БЭМ.
+   Блок — самостоятельный кусок интерфейса, элемент — его часть (block__elem),
+   модификатор — состояние или вид (block--mod). Никаких вложенных селекторов
+   по тегам: правило всегда начинается с класса.
+
+   Здесь нет ни одного цвета: всё через var(--токен). Значения задаёт тема —
+   themes/*.css. Свою тему можно прописать в config.js или загрузить файлом
+   прямо в интерфейсе. */
+
+* { box-sizing: border-box; }
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------- утиль */
+/* правило браузера [hidden]{display:none} слабее классов с display,
+   поэтому усиливаем его явно — весь показ/скрытие идёт через el.hidden */
+[hidden] { display: none !important; }
+
+.spacer { flex: 1 1 auto; }
+
+/* -------------------------------------------------------------------- app */
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.app__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+/* ------------------------------------------------------------------- head */
+.head {
+  flex: 0 0 auto;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-head);
+}
+
+.head__title {
+  flex: 0 0 auto;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.head__meta {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-mute);
+}
+
+.head__file {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-md);
+}
+
+.head__dot {
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+}
+
+.head__dot--empty { background: var(--dot-empty); }
+
+.head__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+
+/* -------------------------------------------------------------------- btn */
+.btn {
+  padding: 7px 13px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--fg-soft);
+  background: transparent;
+  border: 1px solid var(--line-dash);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: var(--acc);
+  color: var(--fg);
+}
+
+.btn--primary {
+  font-weight: 500;
+  color: var(--fg-on);
+  background: var(--fg);
+  border: none;
+  padding: 7px 14px;
+}
+
+.btn--primary:hover { background: var(--btn-on-hi); }
+
+.btn--action {
+  flex: 1;
+  padding: 9px;
+  color: var(--fg);
+  background: var(--bg-btn);
+  border: 1px solid var(--line-btn);
+  border-radius: var(--r-lg);
+}
+
+.btn--wide {
+  width: 100%;
+  padding: 10px;
+  color: var(--fg-on);
+  background: var(--fg);
+  border: none;
+  border-radius: var(--r-lg);
+  font-weight: 500;
+}
+
+.btn--wide:hover { background: var(--btn-on-hi); }
+
+.btn--icon {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--fg-off);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-md);
+}
+
+.btn--mini {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--fg-mute);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-sm);
+}
+
+.btn--square {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 13px;
+  color: var(--fg-soft);
+  background: var(--bg-btn);
+  border: 1px solid var(--line-btn);
+  border-radius: var(--r-lg);
+}
+
+.btn--chip {
+  flex: 1;
+  padding: 9px 6px;
+  font-size: 11.5px;
+  color: var(--fg-soft);
+  background: var(--bg-chip);
+  border: 1px solid var(--line-chip);
+  border-radius: var(--r-md);
+}
+
+.btn--pill {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  color: var(--fg-soft);
+  background: transparent;
+  border: 1px solid var(--line-btn);
+  border-radius: var(--r-md);
+}
+
+.btn--on {
+  color: var(--fg-on);
+  background: var(--fg);
+  border-color: var(--fg);
+}
+
+.btn--on:hover {
+  color: var(--fg-on);
+  background: var(--btn-on-hi);
+  border-color: var(--btn-on-hi);
+}
+
+/* ------------------------------------------------------------------ stage */
+.stage {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage__area {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  overflow: hidden;
+}
+
+.stage__foot {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 0 18px 14px;
+}
+
+.stage__hint {
+  font-size: 11px;
+  color: var(--fg-faint);
+}
+
+/* ----------------------------------------------------------------- canvas */
+.canvas {
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 100%;
+  background: var(--bg-frame);
+  border: 1px solid var(--line-frame);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-frame);
+  cursor: pointer;
+  user-select: none;
+  line-height: 0;
+}
+
+.canvas--ready { cursor: grab; }
+.canvas--drag { cursor: grabbing; }
+
+.canvas--over { border-color: var(--acc); }
+
+.canvas__el {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+.canvas__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 33.333% 33.333%;
+}
+
+.canvas__badge {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  line-height: 1.4;
+  background: var(--on-canvas-bg);
+  border-radius: var(--r-sm);
+  pointer-events: none;
+}
+
+.canvas__badge-text {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--on-canvas-fg);
+}
+
+.canvas__badge-text--dim { color: var(--on-canvas-fg-dim); }
+
+.canvas__drop {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 44px;
+  bottom: 16px;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--on-canvas-fg-dim);
+  background: transparent;
+  border: 1px dashed var(--on-canvas-line);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+}
+
+.canvas__drop:hover,
+.canvas--over .canvas__drop {
+  border-color: var(--acc);
+  color: var(--on-canvas-fg);
+}
+
+/* ------------------------------------------------------------------ panel */
+.panel {
+  flex: 0 0 352px;
+  width: 352px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--line);
+  background: var(--bg-head);
+}
+
+.panel--closed {
+  flex-basis: 46px;
+  width: 46px;
+}
+
+.panel__head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.panel__title {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+}
+
+.panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ------------------------------------------------------------------ block */
+.block {
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+}
+
+.block--open { background: var(--bg-open); }
+
+.block__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 14px;
+  font-family: inherit;
+  color: var(--fg-off);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.block--open .block__head { color: var(--fg); }
+
+.block__mark {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1;
+  border-radius: 50%;
+  background: var(--bg-mark);
+  color: var(--fg-mute);
+}
+
+.block--open .block__mark {
+  background: var(--acc);
+  color: var(--fg-on);
+}
+
+.block__label {
+  flex: 1 0 auto;
+  text-align: left;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.block__summary {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fg-mute);
+}
+
+.block__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 2px 14px 16px;
+}
+
+/* ------------------------------------------------------------------ group */
+.group__title {
+  margin-bottom: 7px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+}
+
+.group__list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.group__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.group__sep {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.group__times {
+  flex: 0 0 auto;
+  color: var(--fg-faint);
+  font-size: 11px;
+}
+
+/* ------------------------------------------------------------------ field */
+.field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.field__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.field__label {
+  font-size: 11.5px;
+  color: var(--fg-dim);
+}
+
+/* число у ползунка — поле ввода, выглядит как текст, пока его не тронут */
+.field__value {
+  flex: 0 0 auto;
+  width: 64px;
+  padding: 0 0 1px;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-align: right;
+  color: var(--fg);
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed transparent;
+  border-radius: 0;
+  cursor: text;
+}
+
+.field__value:hover { border-bottom-color: var(--fg-faint); }
+
+.field__value:focus {
+  outline: none;
+  color: var(--acc);
+  border-bottom-color: var(--acc);
+}
+
+.field__input {
+  width: 100%;
+  padding: 9px 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg);
+  background: var(--bg-input);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-lg);
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: var(--acc);
+}
+
+.field__range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 18px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.field__range::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--range-track);
+  border-radius: 2px;
+}
+
+.field__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--fg);
+  border: none;
+}
+
+.field__range:hover::-webkit-slider-thumb { background: var(--acc); }
+
+.field__range::-moz-range-track {
+  height: 2px;
+  background: var(--range-track);
+  border-radius: 2px;
+}
+
+.field__range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: var(--fg);
+}
+
+/* ----------------------------------------------------------------- preset */
+.preset {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 12px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--r-lg);
+  background: var(--bg-soft);
+  color: var(--fg-soft);
+  border: 1px solid var(--line-row);
+}
+
+.preset:hover { border-color: var(--acc); }
+
+.preset--on {
+  background: var(--fg);
+  color: var(--fg-on);
+  border-color: var(--fg);
+}
+
+.preset__label {
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.preset__meta {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--fg-mute);
+}
+
+.preset--on .preset__meta { color: var(--fg-on-dim); }
+
+/* ------------------------------------------------------------------- hint */
+.hint {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--fg-faint);
+}
+
+.hint--warn { color: var(--warn); }
+
+/* ---------------------------------------------------------------- prefs */
+.prefs {
+  position: absolute;
+  z-index: 60;
+  width: min(380px, calc(100vw - 24px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-pop);
+  border: 1px solid var(--line-frame);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-pop);
+}
+
+.prefs__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.prefs__label {
+  flex: 0 0 52px;
+  font-size: 11.5px;
+  color: var(--fg-dim);
+}
+
+.prefs__select {
+  flex: 1 1 130px;
+  width: auto;
+  min-width: 0;
+  padding: 7px 9px;
+}
+
+.prefs__foot {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 2px;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* --------------------------------------------------------------- scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-scroll);
+  border-radius: 9px;
+}
+
+/* ------------------------------------------------------------------ узкий */
+@media (max-width: 860px) {
+  .app__body { flex-direction: column; }
+
+  .panel,
+  .panel--closed {
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: 52vh;
+    border-left: none;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* =================================================================
+   Дальше — блоки, которых нет в кроппере: раскладки, дорожка,
+   инспектор, слои, очередь, пипетка, окно скрипта.
+   ================================================================= */
+
+/* ------------------------------------------------------------------- seg */
+.seg {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  background: var(--bg-input);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-lg);
+}
+
+.seg__btn {
+  padding: 6px 11px;
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--fg-quiet);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.seg__btn:hover { color: var(--fg); }
+
+.seg__btn--on {
+  color: var(--fg-on);
+  background: var(--fg);
+}
+
+.seg__input {
+  flex: 0 0 62px;
+  width: 62px;
+  padding: 6px 7px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg);
+  background: var(--bg-input);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-sm);
+}
+
+.seg__times {
+  color: var(--fg-faint);
+  font-size: 11px;
+}
+
+/* ------------------------------------------------------------------ head */
+.head__sep {
+  flex: 0 0 1px;
+  width: 1px;
+  height: 22px;
+  background: var(--line-input);
+}
+
+.head__files {
+  flex: 0 1 auto;
+  min-width: 90px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px;
+  background: var(--bg-input);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-md);
+}
+
+.head__slot {
+  min-width: 0;
+  max-width: 150px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 7px;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.head__slot:hover { background: var(--bg-hover); }
+
+.head__dot--track { background: var(--acc); }
+
+/* ---------------------------------------------------------------- layout */
+.app__strip {
+  flex: 0 0 auto;
+  padding: 10px 14px 11px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-strip);
+}
+
+.stage__track {
+  flex: 0 0 auto;
+  padding: 0 18px 14px;
+}
+
+.app--c .app__body { flex-direction: row; }
+.app--c .panel { order: 0; border-left: none; border-right: 1px solid var(--line); }
+.app--c .stage { order: 1; }
+
+/* ----------------------------------------------------------------- frame */
+.frame {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  background: var(--bg-frame);
+  border: 1px solid var(--line-frame);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-frame);
+  line-height: 0;
+  user-select: none;
+}
+
+.frame__cv {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  cursor: grab;
+}
+
+.frame--drag .frame__cv { cursor: grabbing; }
+
+.frame--over { border-color: var(--acc); }
+
+.frame__badge {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  max-width: calc(100% - 16px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  line-height: 1.4;
+  white-space: nowrap;
+  background: var(--on-canvas-bg);
+  border-radius: var(--r-sm);
+  pointer-events: none;
+}
+
+.frame__badge-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--on-canvas-fg-dim);
+}
+
+.frame__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--progress-bg);
+  pointer-events: none;
+}
+
+.frame__progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--acc);
+}
+
+/* -------------------------------------------------------------- frame-box */
+/* Кадр плюс бегунок под ним. Полоска прогресса живёт внутри кадра,
+   стрелка — под его нижним краем, поэтому им нужна общая обёртка. */
+.frame-box {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  line-height: 0;
+}
+
+.frame-box__scrub {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -14px;
+  height: 26px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.frame-box__head {
+  position: absolute;
+  left: 0;
+  bottom: 5px;                     /* остриё смотрит вверх, на полоску */
+  width: 0;
+  height: 0;
+  margin-left: -4px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 5px solid var(--acc);
+  pointer-events: none;
+}
+
+.frame-box--scrub .frame__cv { cursor: ew-resize; }
+
+/* ------------------------------------------------------------- transport */
+.transport {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px 16px;
+}
+
+.transport__time {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-mute);
+}
+
+.transport__hint {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--fg-faint);
+}
+
+/* ----------------------------------------------------------------- track */
+.track {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.track__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.track__cell {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.track__label {
+  font-size: 11px;
+  color: var(--fg-faint);
+}
+
+.track__num {
+  width: 64px;
+  padding: 5px 7px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg);
+  background: var(--bg-input);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-sm);
+}
+
+.track__num--short { width: 58px; }
+
+.track__total {
+  font-family: var(--mono);
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--fg-faint);
+}
+
+.track__box {
+  position: relative;
+  background: var(--wave-bg);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  line-height: 0;
+  cursor: crosshair;
+}
+
+.track__wave {
+  display: block;
+  width: 100%;
+  height: 52px;
+}
+
+.track--tall .track__wave { height: 64px; }
+.track--short .track__wave { height: 44px; }
+
+.track__drop {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--fg-faint);
+  background: transparent;
+  border: 1px dashed var(--line-input);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+}
+
+.track__drop:hover,
+.track__box--over .track__drop {
+  border-color: var(--acc);
+  color: var(--fg);
+}
+
+.track__foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.track__hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--fg-faint);
+}
+
+.track__toggle {
+  flex: 0 0 auto;
+  padding: 3px 0;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.track__toggle:hover { color: var(--acc); }
+
+.track__lanes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.track__lane {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.track__lane-name {
+  flex: 0 0 66px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--fg-lane);
+}
+
+.track__lane-name--btn {
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.track__lane-name--btn:hover { color: var(--acc); }
+
+/* шкала секунд отрезка */
+.track__ruler {
+  position: relative;
+  flex: 1 1 auto;
+  height: 18px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line-lane);
+  cursor: pointer;
+}
+
+.track__tick {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  height: 4px;
+  background: var(--fg-lane);
+  pointer-events: none;
+}
+
+.track__tick--major { height: 8px; }
+
+.track__tick--edge {
+  top: 0;
+  height: auto;
+  background: var(--acc);
+  opacity: 0.6;
+}
+
+.track__tick-label {
+  position: absolute;
+  bottom: 8px;
+  left: 3px;
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1;
+  color: var(--fg-lane);
+  white-space: nowrap;
+}
+
+.track__tick-label--end {
+  left: auto;
+  right: 3px;
+}
+
+.track__lane-box {
+  position: relative;
+  flex: 1 1 auto;
+  height: 20px;
+  background: var(--wave-bg);
+  border: 1px solid var(--line-lane);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.track__clip {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  display: flex;
+  align-items: center;
+  padding: 0 7px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.track__clip--anim {
+  color: var(--lane-anim-fg);
+  background: var(--lane-anim-bg);
+  border: 1px solid var(--lane-anim-line);
+}
+
+.track__clip--text {
+  color: var(--lane-text-fg);
+  background: var(--lane-text-bg);
+  border: 1px solid var(--lane-text-line);
+}
+
+.track__clip--wave {
+  color: var(--fg-dim);
+  background: var(--lane-wave-bg);
+  border: 1px solid var(--line-frame);
+}
+
+.track__clip--frame {
+  color: var(--lane-frame-fg, var(--fg-dim));
+  background: var(--lane-frame-bg, var(--lane-wave-bg));
+  border: 1px solid var(--lane-frame-line, var(--line-frame));
+}
+
+.track__clip--on { box-shadow: inset 0 0 0 1px var(--acc); }
+
+.track__head {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--lane-head);
+  cursor: ew-resize;
+}
+
+/* за головку удобнее браться, чем за линию в пиксель */
+.track__head::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -4px;
+  width: 9px;
+}
+
+.track__lane-box { cursor: pointer; }
+
+/* ----------------------------------------------------------------- insp */
+.insp {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.insp__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.insp__row { padding: 6px 0; }
+
+.insp__more {
+  padding-top: 10px;
+  border-top: 1px solid var(--line-lane);
+}
+
+.insp__more-btn {
+  width: 100%;
+  text-align: left;
+  padding: 4px 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.insp__more-btn:hover { color: var(--acc); }
+
+.insp__more-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.insp__col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --------------------------------------------------------------- select */
+.select {
+  width: 100%;
+  padding: 9px 10px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--fg);
+  background: var(--bg-input);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- layer */
+.layer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line-row);
+  border-radius: var(--r-md);
+  color: var(--fg-soft);
+  cursor: pointer;
+}
+
+.layer--on {
+  background: var(--row-on-bg);
+  border-color: var(--acc);
+}
+
+.layer__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+
+.layer__range {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fg-mute);
+}
+
+.layer__del {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--fg-mute);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.layer__del:hover {
+  color: var(--fg);
+  background: var(--bg-hover);
+}
+
+.layer__add {
+  padding: 9px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--fg-ghost);
+  background: transparent;
+  border: 1px dashed var(--line-dash);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+}
+
+.layer__add:hover {
+  border-color: var(--acc);
+  color: var(--fg);
+}
+
+/* --------------------------------------------------------------- swatch */
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 6px 9px;
+  background: var(--bg-input);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-md);
+  cursor: pointer;
+}
+
+.swatch:hover { border-color: var(--acc); }
+
+.swatch__dot {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--swatch-line);
+}
+
+.swatch__hex {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-mute);
+}
+
+/* ---------------------------------------------------------------- check */
+.check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.check__box {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--acc);
+}
+
+/* ---------------------------------------------------------------- queue */
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.queue__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line-row);
+  border-radius: var(--r-md);
+}
+
+.queue__num {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--fg-mute);
+}
+
+.queue__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-soft);
+}
+
+.queue__meta {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--fg-lane);
+}
+
+.queue__del {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--fg-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.queue__del:hover { color: var(--fg); }
+
+.queue__empty {
+  padding: 12px;
+  border: 1px dashed var(--line-input);
+  border-radius: var(--r-md);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--fg-faint);
+}
+
+/* ---------------------------------------------------------------- modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 40px;
+  background: var(--modal-veil);
+}
+
+.modal__box {
+  width: min(860px, 100%);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-modal);
+  border: 1px solid var(--line-frame);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal__title {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+}
+
+.modal__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.modal__pre {
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--fg-dim);
+  white-space: pre;
+}
+
+/* ----------------------------------------------------------------- cpop */
+.cpop {
+  position: absolute;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--bg-pop);
+  border: 1px solid var(--line-frame);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-pop);
+}
+
+.cpop__sv,
+.cpop__hue {
+  display: block;
+  border-radius: var(--r-sm);
+  cursor: crosshair;
+}
+
+.cpop__hex {
+  width: 200px;
+  padding: 7px 9px;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: lowercase;
+  color: var(--fg);
+  background: var(--bg-input);
+  border: 1px solid var(--line-input);
+  border-radius: var(--r-sm);
+}
+
+/* ------------------------------------------------------------------ warn */
+.warn {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--warn);
+}
+
+@media (max-width: 860px) {
+  .app--c .panel { border-right: none; }
+}

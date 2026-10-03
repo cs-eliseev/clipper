@@ -1,0 +1,105 @@
+/* Светлая тема. Набор токенов тот же, что в dark.css, — меняются только
+   значения. Кадр и волна остаются содержимым, а не интерфейсом, поэтому
+   подписи поверх кадра светлые в любой теме. */
+
+:root {
+  /* ------------------------------------------------------------ шрифты */
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "DejaVu Sans Mono", monospace;
+
+  /* ------------------------------------------------------------ скругления */
+  --r-sm: 6px;
+  --r-md: 7px;
+  --r-lg: 8px;
+  --r-xl: 10px;
+
+  /* ------------------------------------------------------------ поверхности */
+  --bg: #f2f0ec;
+  --bg-head: #ffffff;
+  --bg-strip: #faf9f7;
+  --bg-frame: #e7e4de;
+  --bg-input: #ffffff;
+  --bg-soft: #f7f5f2;
+  --bg-btn: #ffffff;
+  --bg-chip: #f1eee9;
+  --bg-open: #ffffff;
+  --bg-mark: #e3e0d9;
+  --bg-hover: #ebe8e2;
+  --bg-modal: #ffffff;
+  --bg-pop: #ffffff;
+  --bg-scroll: #cfcac1;
+  --row-on-bg: #f7ead3;
+
+  /* ------------------------------------------------------------ линии */
+  --line: #ddd8d0;
+  --line-soft: #e8e4dd;
+  --line-input: #d6d1c8;
+  --line-btn: #cfc9bf;
+  --line-frame: #cdc7bd;
+  --line-chip: #ddd8d0;
+  --line-row: #e2ded6;
+  --line-dash: #c6bfb3;
+  --line-lane: #e2ded6;
+
+  /* ------------------------------------------------------------ текст */
+  --fg: #1b1a18;
+  --fg-soft: #34312c;
+  --fg-dim: #4d4842;
+  --fg-mute: #6b655c;
+  --fg-faint: #7b746a;
+  --fg-off: #857e74;
+  --fg-quiet: #8b8479;
+  --fg-ghost: #7b746a;
+  --fg-lane: #948d82;
+  --fg-on: #faf8f5;
+  --fg-on-dim: #cfcac3;
+
+  /* ------------------------------------------------------------ акценты */
+  --acc: #b4762a;
+  --acc-hi: #8d5b1a;
+  --ok: #5c7c56;
+  --warn: #9d5d10;
+  --btn-on-hi: #000000;
+
+  /* ------------------------------------------------------------ мелочи */
+  --range-track: #d3cec5;
+  --dot-empty: #c3bdb3;
+  --swatch-line: rgba(0, 0, 0, 0.2);
+  --shadow-frame: 0 18px 44px rgba(0, 0, 0, 0.18);
+  --shadow-pop: 0 10px 30px rgba(0, 0, 0, 0.18);
+  --modal-veil: rgba(238, 235, 230, 0.8);
+
+  /* ------------------------------------------------------------ поверх кадра */
+  --on-canvas-bg: rgba(10, 10, 12, 0.72);
+  --on-canvas-fg: #b6b1aa;
+  --on-canvas-fg-dim: #8f8a83;
+  --on-canvas-line: #34343c;
+  --grid-line: rgba(255, 255, 255, 0.14);
+  --progress-bg: rgba(255, 255, 255, 0.08);
+
+  /* ------------------------------------------------------------ холст (JS) */
+  --canvas-bg: #0f0f12;
+  --hatch-a: #d9d5cd;
+  --hatch-b: #cbc6bd;
+  --guide: rgba(180, 118, 42, 0.95);
+
+  /* ------------------------------------------------------------ дорожка */
+  --wave-bg: #f0ede8;
+  --wave-peak: #c2bcb1;
+  --wave-peak-on: #37342f;
+  --wave-sel: rgba(180, 118, 42, 0.18);
+  --wave-marker: #b4762a;
+  --wave-ext: rgba(180, 118, 42, 0.08);
+  --playhead: #1b1a18;
+  --lane-head: rgba(0, 0, 0, 0.55);
+  --lane-anim-bg: rgba(180, 118, 42, 0.18);
+  --lane-anim-line: rgba(180, 118, 42, 0.5);
+  --lane-anim-fg: #6b4413;
+  --lane-text-bg: rgba(92, 124, 86, 0.18);
+  --lane-text-line: rgba(92, 124, 86, 0.45);
+  --lane-text-fg: #3b5436;
+  --lane-wave-bg: rgba(0, 0, 0, 0.05);
+  --lane-frame-bg: rgba(70, 80, 140, 0.16);
+  --lane-frame-line: rgba(70, 80, 140, 0.45);
+  --lane-frame-fg: #33395e;
+}

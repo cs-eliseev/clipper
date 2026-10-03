@@ -1,0 +1,22 @@
+# результаты рендера
+*.mp4
+*.wav
+*.mp3
+.render-*
+
+# личное
+clip*.sh
+*.local.json
+
+# система
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+
+# тесты
+__pycache__/
+.pytest_cache/
+node_modules/

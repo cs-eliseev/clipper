@@ -1,0 +1,11 @@
+{
+  "name": "clipper",
+  "private": true,
+  "type": "module",
+  "description": "Сборка вертикальных клипов. Зависимостей нет: npm install не нужен.",
+  "scripts": {
+    "test": "python3 -m unittest discover -s tests -v",
+    "smoke": "node scripts/smoke.mjs",
+    "check": "npm test && npm run smoke"
+  }
+}
